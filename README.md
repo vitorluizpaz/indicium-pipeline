@@ -34,7 +34,7 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
    ```
 
 2. **Instalação do Meltano**  
-   Com o meltano já instalado, criaremos a pasta meltano dentro da pasta raiz do projeto. Já dentro dela, pelo terminal executaremos:
+   Dentro da pasta meltano executaremos:
    ```bash
    meltano init .
    ```

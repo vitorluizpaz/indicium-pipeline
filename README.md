@@ -86,9 +86,11 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
    airflow standalone
    ```
   
-   Após iniciar o Airflow, podemos disparar as DAGs usando o comando:
+   Após iniciar o Airflow, podemos disparar as DAGs usando os comandos:
    ```bash
    airflow dags unpause {dag_id}
+   ```
+   ```bash
    airflow dags trigger {nome_da_dag} -e {EXECUTION_DATE=YYYY-MM-DD}
    ```
    Após testarmos, para evitar que ela fique rodando podemos usar:
@@ -99,7 +101,7 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
 9. **Testando os Passos da Pipeline**  
    - Primeiro, rodamos **pipeline_step1** para verificar o primeiro passo.
    - Em seguida, rodamos **pipeline_step2** para verificar o segundo passo.
-   - Se as DAGs rodaram com sucesso, as pastas `csv` e `postgres` deverão surgir no diretório **seu_projeto/data**.
+   - Se as DAGs rodaram com sucesso, as pastas `csv` e `postgres` deverão surgir no diretório **seu_projeto/data** e um relatório de sucesso para cada DAG deve surgir no terminal.
 
 10. **Rodando a Pipeline Completa**  
     Agora você pode disparar a DAG pipeline_full para executar a pipeline completa.
@@ -108,7 +110,9 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
     Após rodar a pipeline, podemos rodar uma consulta SQL para garantir o funcionamento:
     ```bash
     docker exec -it postgres_target bash
-   
+    ```
+
+    ```bash
     psql -U target_user -d targetdb -c "COPY (SELECT o.order_id, od.product_id, od.unit_price, od.quantity, od.discount FROM orders o JOIN order_details od ON o.order_id = od.order_id) TO '/var/lib/postgresql/data/final_file.csv' WITH CSV HEADER"
     ```
 

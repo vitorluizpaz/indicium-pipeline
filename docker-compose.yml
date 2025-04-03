@@ -1,0 +1,37 @@
+services:
+
+  postgres_source:
+    image: postgres:15
+    container_name: postgres_source
+    environment:
+      POSTGRES_USER: source_user
+      POSTGRES_PASSWORD: source_pass
+      POSTGRES_DB: northwind
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_source_data:/var/lib/postgresql/data
+    networks:
+      - data-net
+
+  postgres_target:
+    image: postgres:15
+    container_name: postgres_target
+    environment:
+      POSTGRES_USER: target_user
+      POSTGRES_PASSWORD: target_pass
+      POSTGRES_DB: targetdb
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg_target_data:/var/lib/postgresql/data
+    networks:
+      - data-net
+
+networks:
+  data-net:
+    driver: bridge
+
+volumes:
+  pg_source_data:
+  pg_target_data:

@@ -1,0 +1,160 @@
+version: 1
+default_environment: dev
+project_id: 6d388a77-99fe-4e15-bdac-876839310766
+
+environments:
+- name: dev
+- name: staging
+- name: prod
+
+plugins:
+  extractors:
+  - name: tap-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-tap-postgres
+    config:
+      host: localhost
+      port: 5433
+      user: source_user
+      password: source_pass
+      database: northwind
+      filter_schemas:
+      - public
+  - name: tap-postgres-us_states
+    inherit_from: tap-postgres
+    select:
+    - public-us_states
+  - name: tap-postgres-customer_customer_demo
+    inherit_from: tap-postgres
+    select:
+    - public-customer_customer_demo
+  - name: tap-postgres-customer_demographics
+    inherit_from: tap-postgres
+    select:
+    - public-customer_demographics
+  - name: tap-postgres-orders
+    inherit_from: tap-postgres
+    select:
+    - public-orders
+  - name: tap-postgres-products
+    inherit_from: tap-postgres
+    select:
+    - public-products
+  - name: tap-postgres-suppliers
+    inherit_from: tap-postgres
+    select:
+    - public-suppliers
+  - name: tap-postgres-customers
+    inherit_from: tap-postgres
+    select:
+    - public-customers
+  - name: tap-postgres-categories
+    inherit_from: tap-postgres
+    select:
+    - public-categories
+  - name: tap-postgres-employees
+    inherit_from: tap-postgres
+    select:
+    - public-employees
+  - name: tap-postgres-territories
+    inherit_from: tap-postgres
+    select:
+    - public-territories
+  - name: tap-postgres-employee_territories
+    inherit_from: tap-postgres
+    select:
+    - public-employee_territories
+  - name: tap-postgres-shippers
+    inherit_from: tap-postgres
+    select:
+    - public-shippers
+  - name: tap-postgres-region
+    inherit_from: tap-postgres
+    select:
+    - public-region
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+      - entity: order_details
+        path: ../data/order_details.csv
+        keys: [order_id, product_id, unit_price, quantity, discount]
+  - name: tap-csv2
+    namespace: tap-csv2
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    executable: tap-csv
+    config:
+      files:
+      - entity: public-orders
+        path: ../data/postgres/public-orders/$EXECUTION_DATE/public-orders.csv
+        keys: [order_id]
+      - entity: public-products
+        path: ../data/postgres/public-products/$EXECUTION_DATE/public-products.csv
+        keys: [product_id]
+      - entity: public-suppliers
+        path: ../data/postgres/public-suppliers/$EXECUTION_DATE/public-suppliers.csv
+        keys: [supplier_id]
+      - entity: public-customers
+        path: ../data/postgres/public-customers/$EXECUTION_DATE/public-customers.csv
+        keys: [customer_id]
+      - entity: public-categories
+        path: ../data/postgres/public-categories/$EXECUTION_DATE/public-categories.csv
+        keys: [category_id]
+      - entity: public-employees
+        path: ../data/postgres/public-employees/$EXECUTION_DATE/public-employees.csv
+        keys: [employee_id]
+      - entity: public-territories
+        path: ../data/postgres/public-territories/$EXECUTION_DATE/public-territories.csv
+        keys: [territory_id]
+      - entity: public-employee_territories
+        path: 
+          ../data/postgres/public-employee_territories/$EXECUTION_DATE/public-employee_territories.csv
+        keys: [employee_id, territory_id]
+      - entity: public-shippers
+        path: ../data/postgres/public-shippers/$EXECUTION_DATE/public-shippers.csv
+        keys: [shipper_id]
+      - entity: public-region
+        path: ../data/postgres/public-region/$EXECUTION_DATE/public-region.csv
+        keys: [region_id]
+      - entity: order_details
+        path: ../data/csv/$EXECUTION_DATE/order_details.csv
+        keys: [order_id, product_id, unit_price, quantity, discount]
+      - entity: public-us_states
+        path: ../data/postgres/public-us_states/$EXECUTION_DATE/public-us_states.csv
+        keys: [state_id]
+    custom: true
+  loaders:
+  - name: target-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-csv.git
+    config:
+      destination_path: ../data/csv/$EXECUTION_DATE
+  - name: target-db-csv
+    namespace: target-db-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-csv.git
+    executable: target-csv
+    config:
+      destination_path: ../data/postgres/$TABLE/$EXECUTION_DATE
+      add_header: true
+    custom: true
+  - name: target-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-target-postgres
+    config:
+      default_target_schema: public
+      host: localhost
+      port: 5434
+      user: target_user
+      password: target_pass
+      database: targetdb
+  orchestrators:
+  - name: airflow
+    variant: apache
+    pip_url: apache-airflow==2.10.1 --constraint 
+      https://raw.githubusercontent.com/apache/airflow/constraints-2.10.1/constraints-${MELTANO__PYTHON_VERSION}.txt
+  files:
+  - name: files-airflow
+    variant: meltano
+    pip_url: git+https://github.com/meltano/files-airflow.git

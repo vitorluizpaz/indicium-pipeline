@@ -34,13 +34,13 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
    ```
 
 4. **Instalação do Meltano**  
-   Dentro da pasta meltano executaremos:
+   Com o terminal dentro da pasta meltano executaremos:
    ```bash
    meltano init .
    ```
    
 5. **Criação de Extratores e Loaders**  
-   - Dentro da pasta indicium-pipeline/meltano há um arquivo meltano.yml, ele guarda todos os plugins que utilizaremos 
+   - Dentro da pasta meltano há um arquivo meltano.yml, ele guarda todos os plugins que utilizaremos 
    - **Substitua** o seu arquivo meltano.yml pelo arquivo meltano.yml presente na pasta files.  
 
       **ATENÇÃO**: Para criar os extratores e loaders, utilizamos os templates fornecidos na [documentação oficial do Meltano Labs](https://github.com/meltanolabs).  
@@ -56,7 +56,7 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
       - Para carregar os dados extraídos, criamos o `target-postgres` (parte do passo 2).  
 
 6. **Configuração do Banco de Dados do Airflow**  
-   A seguir, inicializamos o banco de dados do Airflow com o comando:
+   A seguir, inicializaremos o banco de dados do Airflow com o comando:
    ```bash
    airflow db init
    ```
@@ -82,13 +82,13 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
    ```
 
 9. **Execução das DAGs**  
-   **Para executar o airflow e conseguirmos rodar as DAGs que dependem do meltano, precisamos estar com o terminal dentro da pasta meltano que está contida no nosso projeto.**
+   **Para executar o airflow e conseguirmos rodar as DAGs que dependem do meltano, precisamos estar com o terminal dentro da pasta meltano que está contida no nosso projeto.**  
    Agora podemos rodar o Airflow com o comando:
    ```
    airflow standalone
    ```
   
-   Após iniciar o Airflow, podemos disparar as DAGs usando os comandos:
+   Após iniciar o Airflow, podemos disparar as DAGs usando os comandos (elas serão disparadas com a data atual):
    ```bash
    airflow dags unpause {dag_id}
    ```
@@ -100,7 +100,7 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
 10. **Testando os Passos da Pipeline**  
    - Primeiro, rodamos **pipeline_step1** para verificar o primeiro passo.
    - Em seguida, rodamos **pipeline_step2** para verificar o segundo passo.
-   - Se as DAGs rodaram com sucesso, as pastas `csv` e `postgres` deverão surgir no diretório **seu_projeto/data** e um relatório de sucesso para cada DAG deve surgir no terminal.
+   - Se as DAGs rodaram com sucesso, as pastas `csv` e `postgres` deverão surgir no diretório **indicium-pipeline/data** e um relatório de sucesso para cada DAG deve surgir no terminal.
 
 11. **Rodando a Pipeline Completa**  
     Agora você pode disparar a DAG pipeline_full para executar a pipeline completa. Sugiro testar com uma data do passado e outras, para que essas dags não reaproveitem os arquivos gerados pelos steps 1 e 2:  
@@ -119,7 +119,7 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
     psql -U target_user -d targetdb -c "COPY (SELECT o.order_id, od.product_id, od.unit_price, od.quantity, od.discount FROM orders o JOIN order_details od ON o.order_id = od.order_id) TO '/var/lib/postgresql/data/final_file.csv' WITH CSV HEADER"
     ```
 
-    Por fim, saímos do contêiner e copiamos o arquivo gerado para o sistema local:
+    Por fim, saímos do contêiner e copiamos o arquivo gerado para o sistema local (utilize pwd no terminal dentro da pasta indicium-pipeline/data/final para obter o **caminho absoluto**):
     ```bash
-    docker cp postgres_target:/var/lib/postgresql/data/final_file.csv /seu_projeto/data/final/
+    docker cp postgres_target:/var/lib/postgresql/data/final_file.csv {CAMINHO_ABSOLUTO}
     ```

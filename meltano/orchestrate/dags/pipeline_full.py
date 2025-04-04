@@ -29,7 +29,7 @@ extractor_names = [
 with DAG(
     'pipeline_full',
     start_date=datetime(2000, 1, 1),
-    catchup=True,
+    catchup=False,
     schedule_interval='@daily',
     default_args=default_args,
 ) as dag:
@@ -37,25 +37,24 @@ with DAG(
     # Exemplo de tarefa "fixa"
     step1_task1 = BashOperator(
         task_id='tap-csv_target-csv',
-        bash_command='/Users/vitorpaz/.local/bin/meltano run tap-csv target-csv',
-        cwd='/Users/vitorpaz/Desktop/indicium-pipeline/meltano',
+        bash_command='meltano run tap-csv target-csv',
+        cwd='.',
         env={
             "EXECUTION_DATE": "{{ ds }}",
-            "PATH": f"/Users/vitorpaz/.local/bin:{os.environ.get('PATH', '')}"
-        },
+            "PATH": f'{os.path.expanduser('~')}/.local/bin:{os.environ.get('PATH', '')}'}
     )
 
     meltano_per_table=[BashOperator(
         task_id=f"tap_postgres_target_db_csv_{extractor}",
         bash_command=(
             'export TABLE={{ params["table"] }} && '
-            '/Users/vitorpaz/.local/bin/meltano run '
+            'meltano run '
             'tap-postgres-{{ params["extractor_name"] }} target-db-csv'
         ),
-        cwd='/Users/vitorpaz/Desktop/indicium-pipeline/meltano',
+        cwd='.',
         env={
             "EXECUTION_DATE": "{{ ds }}",
-            "PATH": f'/Users/vitorpaz/.local/bin:{os.environ.get("PATH", "")}'
+            "PATH": f'{os.path.expanduser('~')}/.local/bin:{os.environ.get('PATH', '')}'
         },
         params={
             "extractor_name": extractor,
@@ -65,11 +64,11 @@ with DAG(
 
     step2_task = BashOperator(
     task_id='tap-csv2_target-postgres',
-    bash_command='/Users/vitorpaz/.local/bin/meltano run tap-csv2 target-postgres',
-    cwd='/Users/vitorpaz/Desktop/indicium-pipeline/meltano',
+    bash_command='meltano run tap-csv2 target-postgres',
+    cwd='.',
     env={
         "EXECUTION_DATE": "{{ ds }}",
-        "PATH": f"/Users/vitorpaz/.local/bin:{os.environ.get('PATH', '')}"
+        "PATH": f'{os.path.expanduser('~')}/.local/bin:{os.environ.get('PATH', '')}'
     },
     )
 

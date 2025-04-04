@@ -15,18 +15,18 @@ default_args = {
 with DAG(
     'pipeline_step2',
     start_date=datetime(2000, 1, 1),
-    catchup=True,
+    catchup=False,
     schedule_interval='@daily',
     default_args=default_args,
 ) as dag:
 
     step2_task = BashOperator(
         task_id='tap-csv2_target-postgres',
-        bash_command='/Users/vitorpaz/.local/bin/meltano run tap-csv2 target-postgres',
-        cwd='/Users/vitorpaz/Desktop/indicium-pipeline/meltano',
+        bash_command='meltano run tap-csv2 target-postgres',
+        cwd='.',
         env={
             "EXECUTION_DATE": "{{ ds }}",
-            "PATH": f"/Users/vitorpaz/.local/bin:{os.environ.get('PATH', '')}"
+            "PATH": f'{os.path.expanduser('~')}/.local/bin:{os.environ.get('PATH', '')}'
         },
     )
 

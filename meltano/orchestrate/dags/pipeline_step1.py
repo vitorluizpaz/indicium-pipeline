@@ -36,11 +36,11 @@ with DAG(
 
     step1_task1 = BashOperator(
         task_id='tap-csv_target-csv',
-        bash_command='/Users/vitorpaz/.local/bin/meltano run tap-csv target-csv',
-        cwd='/Users/vitorpaz/Desktop/indicium-pipeline/meltano',
+        bash_command='meltano run tap-csv target-csv',
+        cwd='.',
         env={
             "EXECUTION_DATE": "{{ ds }}",
-            "PATH": f"/Users/vitorpaz/.local/bin:{os.environ.get('PATH', '')}"
+            "PATH": f'{os.path.expanduser('~')}/.local/bin:{os.environ.get('PATH', '')}'
         },
     )
 
@@ -48,13 +48,13 @@ with DAG(
         task_id=f"tap_postgres_target_db_csv_{extractor}",
         bash_command=(
             'export TABLE={{ params["table"] }} && '
-            '/Users/vitorpaz/.local/bin/meltano run '
+            'meltano run '
             'tap-postgres-{{ params["extractor_name"] }} target-db-csv'
         ),
-        cwd='/Users/vitorpaz/Desktop/indicium-pipeline/meltano',
+        cwd='.',
         env={
             "EXECUTION_DATE": "{{ ds }}",
-            "PATH": f'/Users/vitorpaz/.local/bin:{os.environ.get("PATH", "")}'
+            "PATH": f'{os.path.expanduser('~')}/.local/bin:{os.environ.get('PATH', '')}'
         },
         params={
             "extractor_name": extractor,

@@ -121,5 +121,6 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
 
     Por fim, saímos do contêiner e copiamos o arquivo gerado para o sistema local (utilize pwd no terminal dentro da pasta indicium-pipeline/data/final para obter o **caminho absoluto**):
     ```bash
-    docker cp postgres_target:/var/lib/postgresql/data/final_file.csv {CAMINHO_ABSOLUTO}
-    ```
+    docker cp postgres_target:/var/lib/postgresql/data/final_file.csv {CAMINHO_ABSOLUTO}  
+    ```  
+      **O arquivo csv que exibe os pedidos e seus detalhes é gerado dentro da pasta final.**

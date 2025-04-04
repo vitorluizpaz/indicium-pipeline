@@ -88,7 +88,7 @@ Este projeto utiliza várias ferramentas para orquestrar uma pipeline de dados u
    airflow standalone
    ```
   
-   Após iniciar o Airflow, podemos disparar as DAGs usando os comandos (elas serão disparadas com a data atual):
+   Após iniciar o Airflow, podemos disparar as DAGs usando os comandos (elas serão disparadas com a data atual), caso deseje passar outra data ou uma data do passado utilize o comando disponível na seção 11:
    ```bash
    airflow dags unpause {dag_id}
    ```
